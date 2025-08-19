@@ -91,8 +91,8 @@ content_type = st.radio(
 )
 
 if genre and content_type:
-    st.subheader(f"👉 {genre} 장르의 {content_type} 추천 (6개 중 랜덤 3개)")
-    # 6개 중 3개 랜덤 선택
+    st.subheader(f"👉 {genre} {content_type} 추천")
+    # 6개 중 3개 랜덤 선택 (문구 표시 X)
     choices = random.sample(recommendations[genre][content_type], 3)
     for idx, choice in enumerate(choices, 1):
         st.markdown(f"### {idx}. {choice['제목']} ✨")
