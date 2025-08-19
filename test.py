@@ -114,20 +114,23 @@ recommendations = {
 }
 
 # Streamlit UI
-st.title("📚🎬 장르 기반 책 & 영화 추천기")
+st.title("✨📚🎬 장르 기반 책 & 영화 추천기")
 
 # 장르 선택
-genre = st.selectbox("관심 있는 장르를 선택하세요:", list(recommendations.keys()))
+genre = st.selectbox("🎭 관심 있는 장르를 선택하세요:", list(recommendations.keys()))
 
 # 콘텐츠 타입 선택
-content_type = st.radio("추천 받고 싶은 콘텐츠를 선택하세요:", ["책", "영화"])
+content_type = st.radio("📌 어떤 콘텐츠를 추천받고 싶나요?", ["📖 책", "🎬 영화"])
 
-if genre and content_type:
-    st.subheader(f"👉 {genre} 장르의 {content_type} 추천 (3개)")
-    choices = random.sample(recommendations[genre][content_type], 3)  # 3개 랜덤 선택
+# 이모지 제거해서 데이터 key와 맞추기
+content_key = "책" if "책" in content_type else "영화"
+
+if genre and content_key:
+    st.subheader(f"👉 {genre} 장르의 {content_key} 추천 ⭐ (3개)")
+    choices = random.sample(recommendations[genre][content_key], 3)  # 3개 랜덤 선택
     for idx, choice in enumerate(choices, 1):
-        st.markdown(f"### {idx}. {choice['제목']}")
+        st.markdown(f"### {idx}. {choice['제목']} {'📖' if content_key=='책' else '🎬'}")
         if choice["이미지"]:  # 이미지가 있으면 표시
             st.image(choice["이미지"], width=200)
-        st.write(f"**줄거리**: {choice['줄거리']}")
+        st.write(f"💡 **줄거리**: {choice['줄거리']}")
         st.markdown("---")
