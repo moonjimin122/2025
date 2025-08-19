@@ -1,25 +1,29 @@
 import streamlit as st
 import random
 
-# CSS 스타일 추가 (라디오 버튼 크게)
+# CSS 스타일 (카드형 박스 디자인)
 st.markdown("""
     <style>
-    .stRadio > div {flex-direction: row;} /* 가로 배치 */
-    .stRadio label {
-        font-size: 22px !important;  /* 글씨 크게 */
-        padding: 10px 20px;
-        margin-right: 20px;
-        border: 2px solid #ddd;
-        border-radius: 10px;
-        cursor: pointer;
+    .card {
+        background-color: #ffffff;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .stRadio label:hover {
-        background-color: #f0f0f0;
+    .title {
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    .summary {
+        font-size: 16px;
+        margin-top: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 장르별 데이터 (책과 영화 겹치지 않게 구성)
+# 장르별 데이터 (책/영화 겹치지 않게 정리)
 recommendations = {
     "로맨스": {
         "책": [
@@ -84,9 +88,19 @@ content_key = "책" if "책" in content_type else "영화"
 if genre and content_key:
     st.subheader(f"👉 {genre} 장르의 {content_key} 추천 ⭐ (3개)")
     choices = random.sample(recommendations[genre][content_key], min(3, len(recommendations[genre][content_key])))
+    
     for idx, choice in enumerate(choices, 1):
-        st.markdown(f"### {idx}. {choice['제목']} {'📖' if content_key=='책' else '🎬'}")
-        if choice["이미지"]:
-            st.image(choice["이미지"], width=200)
-        st.write(f"💡 **줄거리**: {choice['줄거리']}")
-        st.markdown("---")
+        with st.container():
+            st.markdown(f"""
+                <div class="card">
+                    <div class="title">{idx}. {choice['제목']} {"📖" if content_key=="책" else "🎬"}</div>
+            """, unsafe_allow_html=True)
+            
+            if choice["이미지"]:
+                st.image(choice["이미지"], width=200)
+            
+            st.markdown(f"""
+                    <div class="summary">💡 <b>줄거리</b>: {choice['줄거리']}</div>
+                </div>
+            """, unsafe_allow_html=True)
+
