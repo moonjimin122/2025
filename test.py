@@ -92,9 +92,18 @@ content_type = st.radio(
 
 if genre and content_type:
     st.subheader(f"👉 {genre} {content_type} 추천")
-    # 6개 중 3개 랜덤 선택 (문구 표시 X)
     choices = random.sample(recommendations[genre][content_type], 3)
-    for idx, choice in enumerate(choices, 1):
-        st.markdown(f"### {idx}. {choice['제목']} ✨")
-        st.write(f"**줄거리**: {choice['줄거리']}")
-        st.markdown("---")
+
+    cols = st.columns(3)  # 가로로 배치
+    for idx, choice in enumerate(choices):
+        with cols[idx]:
+            st.markdown(
+                f"""
+                <div style="background-color:#f9f9f9; padding:15px; border-radius:15px; 
+                box-shadow:2px 2px 8px rgba(0,0,0,0.1); margin-bottom:15px;">
+                    <h4 style="color:#2C3E50; text-align:center;">📖 {choice['제목']}</h4>
+                    <p style="font-size:14px; color:#555;">{choice['줄거리']}</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
