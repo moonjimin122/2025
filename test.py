@@ -67,12 +67,9 @@ if genre and content_type:
     # 추천 3개 랜덤 선택
     choices = random.sample(recommendations[genre][content_type], min(3, len(recommendations[genre][content_type])))
 
-    # 3개를 가로로 배치
-    cols = st.columns(3)
-    for idx, choice in enumerate(choices):
-        with cols[idx]:
-            if choice["이미지"]:  # 이미지가 있는 경우
-                st.image(choice["이미지"], use_container_width=True)
-            st.markdown(f"### {choice['제목']}")
-            st.write(f"✨ **줄거리**: {choice['줄거리']}")
-
+    for idx, choice in enumerate(choices, 1):
+        st.markdown(f"### {idx}. {choice['제목']}")
+        if choice["이미지"]:  # 이미지가 있는 경우만 출력
+            st.image(choice["이미지"], width=200)
+        st.write(f"✨ **줄거리**: {choice['줄거리']}")
+        st.markdown("---")
