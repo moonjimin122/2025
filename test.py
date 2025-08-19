@@ -1,65 +1,103 @@
 import streamlit as st
+import requests
 import random
+import os
 
-# 샘플 데이터 (장르별 책/영화 매핑 + 줄거리)
-recommendations = {
-    "로맨스": {
-        "책": [
-            {"제목": "콜레라 시대의 사랑 - 가브리엘 가르시아 마르케스", "줄거리": "평생에 걸친 사랑과 기다림을 그린 고전 로맨스 소설."},
-            {"제목": "노르웨이의 숲 - 무라카미 하루키", "줄거리": "청춘의 방황과 사랑, 상실을 담은 서정적인 이야기."}
-        ],
-        "영화": [
-            {"제목": "노팅힐", "줄거리": "평범한 서점 주인이 세계적인 배우와 사랑에 빠지는 이야기."},
-            {"제목": "라라랜드", "줄거리": "꿈을 좇는 두 남녀의 사랑과 현실 사이의 갈등을 담은 뮤지컬 영화."},
-            {"제목": "이터널 선샤인", "줄거리": "사랑의 기억을 지우려는 남녀가 다시 서로를 찾아가는 독특한 로맨스."}
-        ]
-    },
-    "판타지": {
-        "책": [
-            {"제목": "해리 포터 - J.K. 롤링", "줄거리": "마법 세계 속 소년 해리 포터의 성장과 모험 이야기."},
-            {"제목": "반지의 제왕 - J.R.R. 톨킨", "줄거리": "절대반지를 파괴하기 위한 여정과 선악의 대결을 그린 대서사시."}
-        ],
-        "영화": [
-            {"제목": "해리 포터 시리즈", "줄거리": "소년 마법사의 우정과 성장, 어둠의 마법사와의 싸움."},
-            {"제목": "반지의 제왕 시리즈", "줄거리": "중간계의 운명을 걸고 절대반지를 없애려는 원정대의 모험."},
-            {"제목": "나니아 연대기", "줄거리": "평범한 아이들이 마법의 세계에서 전설적인 모험을 겪는 이야기."}
-        ]
-    },
-    "스릴러": {
-        "책": [
-            {"제목": "셜록 홈즈 - 아서 코난 도일", "줄거리": "천재 탐정 셜록 홈즈가 사건을 해결하는 추리 소설."},
-            {"제목": "용의자 X의 헌신 - 히가시노 게이고", "줄거리": "완벽한 범죄 뒤에 숨겨진 비극적 사랑과 희생의 이야기."}
-        ],
-        "영화": [
-            {"제목": "세븐", "줄거리": "7대 죄악을 모티프로 연쇄살인을 벌이는 범죄자와 형사의 추적."},
-            {"제목": "메멘토", "줄거리": "단기 기억 상실증을 가진 남자가 아내의 살인범을 찾는 이야기."},
-            {"제목": "살인의 추억", "줄거리": "실제 화성 연쇄 살인사건을 모티프로 한 미제 사건 수사극."}
-        ]
-    },
-    "SF": {
-        "책": [
-            {"제목": "듄 - 프랭크 허버트", "줄거리": "사막 행성 아라키스를 둘러싼 권력과 생존의 서사."},
-            {"제목": "안드로메다 성운 - 이반 예프레모프", "줄거리": "이상적인 미래 사회와 우주 탐험을 그린 소련 SF 고전."}
-        ],
-        "영화": [
-            {"제목": "인터스텔라", "줄거리": "지구를 떠나 새로운 행성을 찾아 떠나는 우주 탐험."},
-            {"제목": "인셉션", "줄거리": "꿈속에서 벌어지는 스파이 액션과 현실을 넘나드는 이야기."},
-            {"제목": "매트릭스", "줄거리": "가상현실 세계와 인간의 자유를 위한 혁명적 싸움."}
-        ]
-    }
+# 🔑 API 키 (여기에 직접 입력하거나, 환경변수 사용)
+TMDB_API_KEY = "여기에_TMDB_API_KEY"
+GOOGLE_BOOKS_API_KEY = "여기에_GOOGLE_BOOKS_API_KEY"
+
+# 장르 매핑 (간단 버전)
+genres = ["로맨스", "판타지", "스릴러", "SF"]
+
+# TMDB 장르 코드 매핑
+tmdb_genres = {
+    "로맨스": 10749,
+    "판타지": 14,
+    "스릴러": 53,
+    "SF": 878
 }
 
+# Google Books 검색어 매핑
+book_keywords = {
+    "로맨스": "romance novel",
+    "판타지": "fantasy novel",
+    "스릴러": "thriller novel",
+    "SF": "science fiction novel"
+}
+
+# 영화 추천 (TMDB API)
+def get_movies(genre, n=3):
+    url = f"https://api.themoviedb.org/3/discover/movie"
+    params = {
+        "api_key": TMDB_API_KEY,
+        "with_genres": tmdb_genres[genre],
+        "language": "ko-KR",
+        "sort_by": "popularity.desc",
+        "page": 1
+    }
+    response = requests.get(url, params=params).json()
+    results = response.get("results", [])
+    if not results:
+        return []
+    choices = random.sample(results, min(n, len(results)))
+    movies = []
+    for m in choices:
+        poster = f"https://image.tmdb.org/t/p/w500{m['poster_path']}" if m.get("poster_path") else None
+        movies.append({
+            "제목": m["title"],
+            "줄거리": m["overview"] if m["overview"] else "줄거리 없음",
+            "이미지": poster
+        })
+    return movies
+
+# 책 추천 (Google Books API)
+def get_books(genre, n=3):
+    keyword = book_keywords[genre]
+    url = "https://www.googleapis.com/books/v1/volumes"
+    params = {
+        "q": keyword,
+        "key": GOOGLE_BOOKS_API_KEY,
+        "maxResults": 20,
+        "printType": "books",
+        "langRestrict": "ko"  # 한국어 우선
+    }
+    response = requests.get(url, params=params).json()
+    items = response.get("items", [])
+    if not items:
+        return []
+    choices = random.sample(items, min(n, len(items)))
+    books = []
+    for b in choices:
+        info = b.get("volumeInfo", {})
+        image = info.get("imageLinks", {}).get("thumbnail")
+        books.append({
+            "제목": info.get("title", "제목 없음"),
+            "줄거리": info.get("description", "줄거리 없음"),
+            "이미지": image
+        })
+    return books
+
 # Streamlit UI
-st.title("📚🎬 장르 기반 책 & 영화 추천기")
+st.title("📚🎬 장르 기반 책 & 영화 추천기 (API 버전)")
 
-# 장르 선택
-genre = st.selectbox("관심 있는 장르를 선택하세요:", list(recommendations.keys()))
-
-# 콘텐츠 타입 선택
+genre = st.selectbox("관심 있는 장르를 선택하세요:", genres)
 content_type = st.radio("추천 받고 싶은 콘텐츠를 선택하세요:", ["책", "영화"])
 
 if genre and content_type:
-    st.subheader(f"👉 {genre} 장르의 {content_type} 추천")
-    choice = random.choice(recommendations[genre][content_type])
-    st.write(f"**제목**: {choice['제목']}")
-    st.write(f"**줄거리**: {choice['줄거리']}")
+    st.subheader(f"👉 {genre} 장르의 {content_type} 추천 (3개)")
+    
+    if content_type == "영화":
+        results = get_movies(genre, n=3)
+    else:
+        results = get_books(genre, n=3)
+    
+    if results:
+        for idx, item in enumerate(results, 1):
+            st.markdown(f"### {idx}. {item['제목']}")
+            if item["이미지"]:
+                st.image(item["이미지"], width=200)
+            st.write(f"**줄거리**: {item['줄거리']}")
+            st.markdown("---")
+    else:
+        st.warning("추천 결과가 없습니다. 😢")
