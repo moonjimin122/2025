@@ -23,7 +23,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 장르별 데이터 (책/영화 겹치지 않게 정리)
+# 장르별 데이터
 recommendations = {
     "로맨스": {
         "책": [
@@ -53,7 +53,7 @@ recommendations = {
         "책": [
             {"제목": "다 빈치 코드", "줄거리": "암호와 미스터리를 풀어가는 종교적 스릴러.", "이미지": "https://upload.wikimedia.org/wikipedia/en/6/6b/DaVinciCode.jpg"},
             {"제목": "드래곤 타투를 한 소녀", "줄거리": "사라진 소녀의 비밀을 추적하는 범죄 스릴러.", "이미지": "https://upload.wikimedia.org/wikipedia/en/0/0c/The_Girl_with_the_Dragon_Tattoo_Poster.jpg"},
-            {"제목": "셜록 홈즈의 모험", "줄거리": "명탐정 셜록 홈즈의 추리와 스릴 넘치는 사건들.", "이미지": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Sherlock_Holmes_Adventures.jpg"}
+            {"제목": "셜록 홈즈의 모험", "줄거리": "명탐정 셜록 홈즈의 추리와 스릴 넘치는 사건들.", "이미지": "https://upload.wikimedia.org/commons/8/8d/Sherlock_Holmes_Adventures.jpg"}
         ],
         "영화": [
             {"제목": "세븐", "줄거리": "7대 죄악을 모티브로 한 연쇄 살인 사건 추적.", "이미지": "https://upload.wikimedia.org/wikipedia/en/6/68/Seven_%28movie%29_poster.jpg"},
@@ -81,8 +81,8 @@ st.title("✨📚🎬 장르 기반 책 & 영화 추천기")
 # 장르 선택
 genre = st.selectbox("🎭 관심 있는 장르를 선택하세요:", list(recommendations.keys()))
 
-# 책/영화 선택
-content_type = st.radio("📌 어떤 콘텐츠를 추천받고 싶나요?", ["📖 책", "🎬 영화"])
+# 책/영화 선택 (좀 크게)
+content_type = st.radio("📌 어떤 콘텐츠를 추천받고 싶나요?", ["📖 책", "🎬 영화"], horizontal=True)
 content_key = "책" if "책" in content_type else "영화"
 
 if genre and content_key:
@@ -103,4 +103,3 @@ if genre and content_key:
                     <div class="summary">💡 <b>줄거리</b>: {choice['줄거리']}</div>
                 </div>
             """, unsafe_allow_html=True)
-
