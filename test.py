@@ -35,11 +35,13 @@ MOVIES = {
 # 앱 제목
 st.title("🎬 한국 영화 추천 앱")
 
-st.write("테마별 추천 한국 영화를 확인해보세요!")
+st.write("원하는 테마를 선택하면 해당 테마의 영화들을 추천해드립니다!")
 
-# 테마별로 전체 출력
-for theme, movies in MOVIES.items():
-    st.subheader(f"⭐ {theme} 영화 추천")
-    for m in movies:
-        st.write(f"🎥 **{m['title']}** - {m['desc']}")
-    st.markdown("---")
+# 테마 선택
+themes = list(MOVIES.keys())
+selected_theme = st.selectbox("테마 선택", themes)
+
+# 선택한 테마의 영화만 출력
+st.subheader(f"⭐ {selected_theme} 영화 추천")
+for m in MOVIES[selected_theme]:
+    st.write(f"🎥 **{m['title']}** - {m['desc']}")
